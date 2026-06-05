@@ -58,7 +58,7 @@ Open **http://localhost:7860** in your browser.
 **1. Clone and install:**
 ```bash
 git clone https://github.com/sabkatdesh/football_offside.git
-cd offside-detection
+cd football_offside
 pip install -r requirements.txt
 ```
 

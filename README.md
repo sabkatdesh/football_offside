@@ -49,7 +49,7 @@ docker compose --profile cpu up --build
 ```
 
 Models are downloaded from HuggingFace automatically during the build.
-Open **http://localhost:8000** in your browser.
+Open **http://localhost:7860** in your browser.
 
 ---
 
@@ -57,7 +57,7 @@ Open **http://localhost:8000** in your browser.
 
 **1. Clone and install:**
 ```bash
-git clone <repo-url>
+git clone https://github.com/sabkatdesh/football_offside.git
 cd offside-detection
 pip install -r requirements.txt
 ```
@@ -75,10 +75,10 @@ Into `data/models/`.
 **3. Run the server:**
 ```bash
 cd backend
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+uvicorn main:app --host 0.0.0.0 --port 7860 --reload
 ```
 
-Open **http://localhost:8000**
+Open **http://localhost:7860**
 
 ---
 

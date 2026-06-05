@@ -1,0 +1,41 @@
+version: "3.9"
+
+# ── Usage ──────────────────────────────────────────────────────────────────────
+# GPU:  docker compose --profile gpu up
+# CPU:  docker compose --profile cpu up
+# ──────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── GPU variant ────────────────────────────────────────────────────────────
+  offside-gpu:
+    profiles: ["gpu"]
+    build: .
+    image: offside-app:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data/uploads:/app/data/uploads
+      - ./data/outputs:/app/data/outputs
+      - ./data/models:/app/data/models   # optional: persist downloaded models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+  # ── CPU variant ─────────────────────────────────────────────────────────────
+  offside-cpu:
+    profiles: ["cpu"]
+    build: .
+    image: offside-app:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data/uploads:/app/data/uploads
+      - ./data/outputs:/app/data/outputs
+      - ./data/models:/app/data/models
+    restart: unless-stopped

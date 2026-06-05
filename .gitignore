@@ -1,0 +1,39 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+.env
+venv/
+.venv/
+*.egg
+
+# ── Data folders (large / generated files) ────────────────────────────────────
+data/uploads/
+data/outputs/
+
+# Keep the folders themselves (so git tracks the structure)
+!data/uploads/.gitkeep
+!data/outputs/.gitkeep
+
+# ── Model weights (large .pt files) ───────────────────────────────────────────
+# Option A: exclude entirely (recommended if > 100 MB)
+data/models/*.pt
+data/models/*.pth
+
+# Option B: if you want to include small models, comment out the lines above
+# and use Git LFS instead (run: git lfs track "*.pt")
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+*.log
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.suo
+*.user

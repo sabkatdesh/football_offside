@@ -1,0 +1,30 @@
+# ── Web framework ─────────────────────────────────────────────────────────────
+fastapi==0.111.0
+uvicorn[standard]==0.30.1
+python-multipart==0.0.9
+
+# ── Computer vision & ML ──────────────────────────────────────────────────────
+ultralytics==8.4.56
+supervision==0.23.0
+opencv-python-headless==4.10.0.84
+numpy==1.26.4
+
+# ── PyTorch (CPU+GPU — Docker image provides CUDA runtime separately) ─────────
+torch==2.3.1
+torchvision==0.18.1
+
+# ── Team classification ───────────────────────────────────────────────────────
+transformers==4.44.2
+umap-learn==0.5.6
+scikit-learn==1.5.1
+pillow==10.4.0
+
+# ── Roboflow sports utilities ─────────────────────────────────────────────────
+sports @ git+https://github.com/roboflow/sports.git
+
+# ── Model download ────────────────────────────────────────────────────────────
+huggingface_hub==0.24.6
+
+# ── Misc ──────────────────────────────────────────────────────────────────────
+tqdm==4.66.4
+pydantic==2.7.4

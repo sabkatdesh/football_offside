@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sabkat's Football AI — Offside Detection</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ── Ambient background ─────────────────────────────────────────────── -->
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow--1"></div>
+  <div class="bg-glow bg-glow--2"></div>
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header__inner">
+      <div class="header__logo">
+        <span class="logo-badge">AI</span>
+        <span class="logo-text">Sabkat's <em>Football AI</em></span>
+      </div>
+      <div class="header__tag">Offside Detection System <span class="version">v1.1</span></div>
+    </div>
+  </header>
+
+  <!-- ── Main ───────────────────────────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- STATE 1: Upload -->
+    <section id="state-upload" class="state state--active">
+      <div class="upload-hero">
+        <p class="upload-hero__eyebrow">Computer Vision · YOLOv8 · Homography</p>
+        <h1 class="upload-hero__title">Drop a clip.<br>Get the verdict.</h1>
+        <p class="upload-hero__sub">
+          Upload broadcast-style football footage and our AI will detect
+          offside positions frame-by-frame with a tactical radar overlay.
+        </p>
+      </div>
+
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" accept=".mp4,.avi,.mov,.mkv" hidden />
+        <div class="upload-zone__inner">
+          <div class="upload-icon">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="2" stroke-dasharray="4 3"/>
+              <path d="M32 42V22M32 22L24 30M32 22L40 30" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <p class="upload-zone__cta">Drag & drop your video here</p>
+          <p class="upload-zone__sub">or <button class="link-btn" id="browseBtn">browse files</button></p>
+          <p class="upload-zone__formats">MP4 · AVI · MOV · MKV &nbsp;·&nbsp; max 500 MB</p>
+        </div>
+      </div>
+
+      <div id="filePreview" class="file-preview hidden">
+        <div class="file-preview__icon">▶</div>
+        <div class="file-preview__info">
+          <span id="fileName" class="file-preview__name"></span>
+          <span id="fileSize" class="file-preview__size"></span>
+        </div>
+        <button class="file-preview__remove" id="removeFile" title="Remove">✕</button>
+      </div>
+
+      <button class="btn-analyze" id="analyzeBtn" disabled>
+        <span class="btn-analyze__text">Analyze Clip</span>
+        <span class="btn-analyze__arrow">→</span>
+      </button>
+
+      <div id="uploadError" class="error-msg hidden"></div>
+    </section>
+
+    <!-- STATE 2: Processing -->
+    <section id="state-processing" class="state">
+      <div class="processing-card">
+        <div class="pitch-animation">
+          <div class="pitch-lines">
+            <div class="pitch-line pitch-line--center"></div>
+            <div class="pitch-line pitch-line--box-left"></div>
+            <div class="pitch-line pitch-line--box-right"></div>
+          </div>
+          <div class="dot dot--blue" id="dotBlue"></div>
+          <div class="dot dot--pink" id="dotPink"></div>
+          <div class="dot dot--ball" id="dotBall"></div>
+          <div class="offside-line-anim" id="offsideLineAnim"></div>
+        </div>
+
+        <h2 class="processing-title">Analyzing clip…</h2>
+        <p class="processing-sub" id="processingMsg">Running player detection</p>
+
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-labels">
+          <span class="progress-pct" id="progressPct">0%</span>
+          <span class="progress-stage" id="progressStage">Initializing</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATE 3 & 4: Result -->
+    <section id="state-result" class="state">
+
+      <div class="verdict-banner" id="verdictBanner">
+        <div class="verdict-banner__label" id="verdictLabel">OFFSIDE</div>
+        <div class="verdict-banner__sub" id="verdictSub">Player detected ahead of last defender</div>
+      </div>
+
+      <div class="result-grid">
+        <div class="video-panel">
+          <div class="panel-header">
+            <span class="panel-header__title">Annotated Output</span>
+            <span class="panel-header__badge" id="jobIdBadge"></span>
+          </div>
+          <div class="video-wrap">
+            <video id="resultVideo" controls playsinline>
+              Your browser does not support video playback.
+            </video>
+          </div>
+          <div class="video-actions">
+            <button class="btn-action btn-action--download" id="downloadBtn">
+              <span>⬇</span> Download Video
+            </button>
+            <button class="btn-action btn-action--new" id="newAnalysisBtn">
+              <span>↩</span> New Analysis
+            </button>
+          </div>
+        </div>
+
+        <div class="info-panel">
+          <div class="info-card" id="infoCard">
+            <h3 class="info-card__title">Analysis Summary</h3>
+            <dl class="info-list">
+              <dt>Verdict</dt>
+              <dd id="summaryVerdict">—</dd>
+              <dt>Job ID</dt>
+              <dd id="summaryJobId" class="mono">—</dd>
+              <dt>Status</dt>
+              <dd id="summaryStatus">—</dd>
+            </dl>
+          </div>
+
+          <div class="info-card info-card--legend">
+            <h3 class="info-card__title">Annotation Key</h3>
+            <ul class="legend">
+              <li><span class="legend-dot" style="background:#00BFFF"></span>Team A players</li>
+              <li><span class="legend-dot" style="background:#FF1493"></span>Team B players</li>
+              <li><span class="legend-dot" style="background:#FFD700"></span>Referees / Ball</li>
+              <li><span class="legend-line" style="background:#ff3333"></span>Offside line</li>
+              <li><span class="legend-line" style="background:#00ff88"></span>Onside line</li>
+            </ul>
+          </div>
+
+          <div class="info-card info-card--note">
+            <p>
+              <strong>Note:</strong> Analysis works best with broadcast-style
+              wide-angle footage from professional matches.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATE 5: Error -->
+    <section id="state-error" class="state">
+      <div class="error-card">
+        <div class="error-card__icon">⚠</div>
+        <h2 class="error-card__title">Analysis Failed</h2>
+        <p class="error-card__msg" id="errorMsg">Something went wrong during processing.</p>
+        <button class="btn-analyze" id="retryBtn">Try Again</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────────────────────────── -->
+  <footer class="footer">
+    <span>Sabkat's Football AI · Offside Detection</span>
+    <span>YOLOv8 · SigLIP · Homography · ByteTrack</span>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

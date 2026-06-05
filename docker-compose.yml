@@ -33,7 +33,7 @@ services:
     build: .
     image: offside-app:latest
     ports:
-      - "8000:8000"
+      - "7860:7860"
     volumes:
       - ./data/uploads:/app/data/uploads
       - ./data/outputs:/app/data/outputs
